@@ -40,3 +40,6 @@ Dashboard/opportunity rows, release calendar, scores and market indicators are s
 - It uses same-currency sold samples only, and displays a conservative Q1 reference and a median reference.
 - Editable inputs: estimated marketplace fee percentage, outbound shipping, other costs, and target net profit.
 - The result is a scenario, not a buy signal: verify edition, completeness, condition, shipping, and liquidity before buying.
+
+## Sold-comp opportunity calculator
+After a sold-listings scan, the interface displays separate currency statistics and a margin scenario calculator: Q1 (cautious), median, and Q3 (optimistic) max-buy prices. Enter your own purchase price to estimate net profit at Q1 and median references. Marketplace fees, seller shipping, packaging/miscellaneous costs, and target profit are assumptions and must be edited to match the transaction. The calculation is not a purchase recommendation; inspect comparability, condition, completeness, Best Offer pricing and shipping uncertainty.
