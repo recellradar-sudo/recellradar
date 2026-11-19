@@ -24,3 +24,12 @@ Dashboard/opportunity rows, release calendar, scores and market indicators are s
 3. In Netlify environment variables, add SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (server-side only). Never expose the service-role key in the frontend.
 4. Redeploy. Successful sold scans attempt to save their search and returned sample to scan_history. The Settings screen reports whether database credentials are configured, and the Scan History page lists recent scans.
 5. Without Supabase configured, scans still work but are not persisted.
+
+
+## Normalized sold-sales analytics
+- The scan response now includes `normalizedStats`, calculated from the provider's raw results.
+- Sale totals are grouped by currency; currencies are never merged into one statistic.
+- `totalPrice` is preferred; otherwise sold price plus shipping is used when shipping is reported. Missing shipping is flagged in each currency group.
+- Each currency group exposes sample size, median, quartiles (Q1/Q3), min/max, count with shipping unknown, and Best Offer rows.
+- Raw `results` remain included for audit/export. This is statistical normalization, not edition matching or a resale forecast.
+- Unit tests are included in `netlify/functions/lib/tests/sales-normalizer.test.js` (run with Node's test runner when available).
