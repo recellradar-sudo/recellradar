@@ -22,7 +22,7 @@ exports.handler = async (event) => {
     if (!keyword) return { statusCode: 400, headers, body: JSON.stringify({ error: "Keyword is required." }) };
     if (!allowed.has(marketplace)) return { statusCode: 400, headers, body: JSON.stringify({ error: "Unsupported marketplace." }) };
     const mode = body.mode === "active" ? "active" : "sold";
-    const apiUrl = "https://api.ebaysoldlistingsapi.com/scrape?keyword=" + encodeURIComponent(keyword) + "&ebaySite=" + encodeURIComponent(marketplace) + "&count=40&sold=" + (mode === "sold" ? "true" : "false") + "&relevance=true";
+    const apiUrl = "https://api.ebaysoldlistingsapi.com/scrape?keyword=" + encodeURIComponent(keyword) + "&ebaySite=" + encodeURIComponent(marketplace) + "&count=40&sold=" + (mode === "sold" ? "true" : "false") + (mode === "sold" ? "&bestOfferPrice=true" : "") + "&relevance=true";
     const response = await fetch(apiUrl, { headers: { Authorization: "Bearer " + apiKey }, signal: AbortSignal.timeout(20000) });
     const raw = await response.text();
     if (!response.ok) return { statusCode: 502, headers, body: JSON.stringify({ error: "Sold listings provider returned HTTP " + response.status, detail: raw.slice(0, 300) }) };
