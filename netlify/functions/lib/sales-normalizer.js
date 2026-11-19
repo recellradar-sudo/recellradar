@@ -17,10 +17,11 @@ function quantile(values, q) {
 }
 function normalizeSales(results) {
   const rows = (Array.isArray(results) ? results : []).map((x) => {
+    const accepted = x.bestOfferAccepted && x.acceptedOfferPriceStatus === "found" ? numeric(x.acceptedOfferPrice) : null;
     const sold = numeric(x.soldPrice);
     const total = numeric(x.totalPrice);
     const shipping = x.shippingPrice === 0 || x.shippingPrice === "0" ? 0 : numeric(x.shippingPrice);
-    const price = total ?? (sold !== null ? sold + (shipping ?? 0) : null);
+    const price = accepted ?? total ?? (sold !== null ? sold + (shipping ?? 0) : null);
     const currency = String(x.soldCurrency || x.currency || "UNKNOWN").toUpperCase();
     return { price, currency, shippingKnown: total !== null || shipping !== null, bestOffer: Boolean(x.bestOfferAccepted), raw: x };
   }).filter(x => x.price !== null);
