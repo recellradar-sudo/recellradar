@@ -215,7 +215,9 @@ document.getElementById("runOpportunityScan").onclick=async()=>{
  const blockers=t=>/\b(lot|bundle|pack of|job lot|accessory|accessories|manual only|case only|box only|boite seule|without game|sans jeu|empty box)\b/i.test(norm(t));
  const editionFlags=["steelbook","steel book","standard","collector","deluxe","ultimate","limited","complete","sealed","loose"];
  const editionMismatch=(a,b)=>editionFlags.some(k=>norm(a).includes(k)!==norm(b).includes(k));
- const titleMatch=(a,b)=>{if(!a||!b||blockers(a)||blockers(b)||editionMismatch(a,b))return false;const A=tokens(a),B=tokens(b),shared=[...A].filter(x=>B.has(x)),union=new Set([...A,...B]).size;return shared.length>=2&&shared.length/Math.max(1,union)>=.24};
+ const platformFlags=["ps5","playstation 5","ps4","playstation 4","ps3","playstation 3","ps2","playstation 2","xbox series","xbox one","xbox 360","xbox","switch","nintendo switch","wii u","wii","3ds","ds","pc","steam","gamecube","n64","nes","snes","megadrive","dreamcast"];
+ const platformMismatch=(a,b)=>platformFlags.some(k=>norm(a).includes(k)!==norm(b).includes(k));
+ const titleMatch=(a,b)=>{if(!a||!b||blockers(a)||blockers(b)||editionMismatch(a,b)||platformMismatch(a,b))return false;const A=tokens(a),B=tokens(b),shared=[...A].filter(x=>B.has(x)),union=new Set([...A,...B]).size;return shared.length>=2&&shared.length/Math.max(1,union)>=.24};
  try{
   const [ar,sr]=await Promise.all([
    fetch("/.netlify/functions/sold-scan",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({keyword:q,marketplace:market,mode:"active"})}),
