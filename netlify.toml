@@ -2,5 +2,10 @@
   publish = "resell-radar"
   functions = "netlify/functions"
 
+[[redirects]]
+  from = "/api/sold-search"
+  to = "/.netlify/functions/sold-search"
+  status = 200
+
 [functions]
   node_bundler = "esbuild"
