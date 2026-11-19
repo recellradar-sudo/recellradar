@@ -16,3 +16,11 @@ Static interactive demo with a Netlify serverless endpoint for the eBay Sold Lis
 
 ## Prototype limitations
 Dashboard/opportunity rows, release calendar, scores and market indicators are still sample/demo data. Watchlist and portfolio state remain browser-local. There is no remote database, scheduled scanning, Gmail sending or user authentication yet.
+
+
+## Optional scan-history database (Supabase)
+1. In Supabase, create a project and open SQL Editor.
+2. Run the SQL in supabase/schema.sql to create the scan_history table.
+3. In Netlify environment variables, add SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (server-side only). Never expose the service-role key in the frontend.
+4. Redeploy. Successful sold scans attempt to save their search and returned sample to scan_history. The Settings screen reports whether database credentials are configured, and the Scan History page lists recent scans.
+5. Without Supabase configured, scans still work but are not persisted.
