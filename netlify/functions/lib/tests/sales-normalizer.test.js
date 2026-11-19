@@ -27,3 +27,9 @@ test("reports missing prices and best-offer rows", () => {
   assert.equal(stats.currencies[0].median, 29);
   assert.equal(stats.currencies[0].bestOfferCount, 1);
 });
+
+test("zero shipping is reported as known", () => {
+  const stats = normalizeSales([{ soldPrice: 40, shippingPrice: 0, soldCurrency: "EUR" }]);
+  assert.equal(stats.currencies[0].median, 40);
+  assert.equal(stats.currencies[0].shippingUnknownCount, 0);
+});
