@@ -213,8 +213,9 @@ document.getElementById("runOpportunityScan").onclick=async()=>{
  const norm=t=>String(t||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
  const tokens=t=>new Set(norm(t).split(" ").filter(w=>w.length>2&&!["edition","collector","limited","video","game","games","jeu","jeux","the","and","for","with","of","le","la","les","des","du","de","sealed","new","brand"].includes(w)));
  const blockers=t=>/\b(lot|bundle|pack of|job lot|accessory|accessories|manual only|case only|box only|boite seule|without game|sans jeu|empty box)\b/i.test(norm(t));
- const editionFlags=["steelbook","steel book","standard","collector","deluxe","ultimate","limited","complete","sealed","loose"];
- const editionMismatch=(a,b)=>editionFlags.some(k=>norm(a).includes(k)!==norm(b).includes(k));
+ const editionGroups=[["steelbook","steel book"],["standard"],["collector"],["deluxe"],["ultimate"],["limited"],["complete"],["sealed"],["loose"]];
+ const detectedEditions=t=>editionGroups.map((g,i)=>g.some(k=>norm(t).includes(norm(k)))?i:null).filter(i=>i!==null);
+ const editionMismatch=(a,b)=>{const ea=detectedEditions(a),eb=detectedEditions(b);return ea.length&&eb.length&&!ea.some(x=>eb.includes(x));};
  const platformGroups=[["ps5","playstation 5"],["ps4","playstation 4"],["ps3","playstation 3"],["ps2","playstation 2"],["xbox series","series x","series s"],["xbox one"],["xbox 360"],["switch","nintendo switch"],["wii u"],["wii"],["3ds"],["ds"],["pc","steam"],["gamecube"],["n64","nintendo 64"],["nes"],["snes"],["megadrive","mega drive"],["dreamcast"]];
  const detectedPlatforms=t=>platformGroups.map((g,i)=>g.some(k=>norm(t).includes(norm(k)))?i:null).filter(i=>i!==null);
  const platformMismatch=(a,b)=>{const pa=detectedPlatforms(a),pb=detectedPlatforms(b);return pa.length&&pb.length&&!pa.some(x=>pb.includes(x));};
