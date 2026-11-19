@@ -1,3 +1,5 @@
+const { normalizeSales } = require("./lib/sales-normalizer");
+
 exports.handler = async (event) => {
   const allowedOrigin = "https://resellradar.netlify.app";
   const headers = {
@@ -26,6 +28,7 @@ exports.handler = async (event) => {
     let data;
     try { data = JSON.parse(raw); } catch { return { statusCode: 502, headers, body: JSON.stringify({ error: "Provider response was not valid JSON." }) }; }
     const results = Array.isArray(data.results) ? data.results : [];
+    const normalizedStats = normalizeSales(results);
     let historySaved = false;
     if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
       try {
@@ -37,7 +40,7 @@ exports.handler = async (event) => {
         historySaved = save.ok;
       } catch (_) { historySaved = false; }
     }
-    return { statusCode: 200, headers, body: JSON.stringify({ ebaySite: data.ebaySite || marketplace, totalResults: data.totalResults, results, usageRemaining: response.headers.get("X-Usage-Remaining") || null, historySaved }) };
+    return { statusCode: 200, headers, body: JSON.stringify({ ebaySite: data.ebaySite || marketplace, totalResults: data.totalResults, results, normalizedStats, usageRemaining: response.headers.get("X-Usage-Remaining") || null, historySaved }) };
   } catch (err) {
     return { statusCode: 500, headers, body: JSON.stringify({ error: "Scanner proxy error", detail: String(err.message || err).slice(0, 250) }) };
   }
