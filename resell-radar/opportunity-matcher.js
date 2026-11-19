@@ -40,9 +40,16 @@
     return price === null ? null : price + (shipping ?? 0);
   }
   function median(values) { const sorted = [...values].sort((a, b) => a - b), middle = Math.floor(sorted.length / 2); return sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2; }
+  function quantile(values, percentile) {
+    if (!Array.isArray(values) || values.length === 0) return null;
+    const sorted = [...values].sort((a, b) => a - b);
+    const index = (sorted.length - 1) * percentile;
+    const lower = Math.floor(index), upper = Math.ceil(index);
+    return sorted[lower] + (sorted[upper] - sorted[lower]) * (index - lower);
+  }
   function estimateProfit({ resalePrice, acquisitionCost, feeRate, otherCosts }) {
     const value = resalePrice * (1 - feeRate) - acquisitionCost - otherCosts;
     return Math.round((value + Number.EPSILON) * 100) / 100;
   }
-  return { titleMatch, hasKnownShipping, listingCost, median, estimateProfit };
+  return { titleMatch, hasKnownShipping, listingCost, median, quantile, estimateProfit };
 });
