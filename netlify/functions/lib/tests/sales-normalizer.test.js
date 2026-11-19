@@ -1,6 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { normalizeSales } = require("../lib/sales-normalizer");
+const { normalizeSales } = require("../sales-normalizer");
 
 test("prefers total price and separates currencies", () => {
   const stats = normalizeSales([
@@ -32,6 +32,11 @@ test("zero shipping is reported as known", () => {
   const stats = normalizeSales([{ soldPrice: 40, shippingPrice: 0, soldCurrency: "EUR" }]);
   assert.equal(stats.currencies[0].median, 40);
   assert.equal(stats.currencies[0].shippingUnknownCount, 0);
+});
+
+test("counts rows whose shipping amount is unknown", () => {
+  const stats = normalizeSales([{ soldPrice: 40, soldCurrency: "EUR" }]);
+  assert.equal(stats.currencies[0].shippingUnknownCount, 1);
 });
 
 test("uses accepted Best Offer price when provider confirms it", () => {

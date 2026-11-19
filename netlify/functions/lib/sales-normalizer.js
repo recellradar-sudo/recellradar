@@ -29,7 +29,7 @@ function normalizeSales(results) {
   for (const row of rows) (groups[row.currency] ||= []).push(row);
   const currencies = Object.entries(groups).map(([currency, items]) => {
     const prices = items.map(x => x.price);
-    return { currency, sampleSize: items.length, median: median(prices), q1: quantile(prices, .25), q3: quantile(prices, .75), min: Math.min(...prices), max: Math.max(...prices), shippingUnknownCount: items.filter(x => !x.shipping_known).length, bestOfferCount: items.filter(x => x.bestOffer).length };
+    return { currency, sampleSize: items.length, median: median(prices), q1: quantile(prices, .25), q3: quantile(prices, .75), min: Math.min(...prices), max: Math.max(...prices), shippingUnknownCount: items.filter(x => !x.shippingKnown).length, bestOfferCount: items.filter(x => x.bestOffer).length };
   }).sort((a,b) => b.sampleSize-a.sampleSize);
   return { totalRecords: Array.isArray(results) ? results.length : 0, pricedRecords: rows.length, unpricedRecords: (Array.isArray(results) ? results.length : 0)-rows.length, currencies, warning: currencies.length > 1 ? "Multiple currencies detected. Statistics are separated by currency; do not compare or combine them." : null };
 }
