@@ -43,3 +43,9 @@ Dashboard/opportunity rows, release calendar, scores and market indicators are s
 
 ## Sold-comp opportunity calculator
 After a sold-listings scan, the interface displays separate currency statistics and a margin scenario calculator: Q1 (cautious), median, and Q3 (optimistic) max-buy prices. Enter your own purchase price to estimate net profit at Q1 and median references. Marketplace fees, seller shipping, packaging/miscellaneous costs, and target profit are assumptions and must be edited to match the transaction. The calculation is not a purchase recommendation; inspect comparability, condition, completeness, Best Offer pricing and shipping uncertainty.
+
+## Active listing vs sold-comp opportunity scan
+- The server endpoint now accepts `mode: "active"` to retrieve current asking listings (`sold=false`) or `mode: "sold"` for completed sales. The API provider documents both modes on the same `/scrape` endpoint.
+- The Live Market Search view has a comparison button that fetches both sets, computes the sold-price median and ranks live asking prices by a rough profit estimate (median × 86.5% − asking price − €5.99 assumed misc cost).
+- The comparison is deliberately labeled **unverified**: it compares search-wide samples, not exact product editions/condition, assumes a 13.5% sale fee, excludes active listing shipping and does not verify sell-through/liquidity. It is a candidate triage, not a buy signal.
+- API docs: https://ebaysoldlistingsapi.com/docs/active-listings and https://ebaysoldlistingsapi.com/docs/sold-search
