@@ -5,11 +5,11 @@ Static interactive demo with a Netlify serverless endpoint for the eBay Sold Lis
 ## Deploy on Netlify
 - Netlify config is in root `netlify.toml` (publish directory `resell-radar`, functions directory `netlify/functions`).
 - Configure environment variable `EBAY_SOLD_API_KEY` in Netlify site settings (Site configuration → Environment variables). Never paste the key into the app/browser.
-- Trigger a deploy after adding the variable. The scanner calls `/api/sold-search`, redirected to the `sold-search` Netlify Function by `netlify.toml`.
+- Trigger a deploy after adding the variable. The scanner calls `/.netlify/functions/sold-scan` (also exposed through the legacy `/api/sold-search` redirect).
 - If Netlify's deploy settings are manually overriding the publish/functions paths, align them with the root `netlify.toml`.
 
 ## Scanner
-- POST JSON: `{ "keyword": "...", "ebaySite": "ebay.fr" }`
+- POST JSON: `{ "keyword": "...", "marketplace": "ebay.fr" }`
 - Supported marketplace IDs: ebay.fr, ebay.de, ebay.co.uk, ebay.com, ebay.it, ebay.es
 - Provider response is passed through as sold results and usage-remaining metadata; no mock rows are generated.
 - API key is server-side only via Netlify environment variable.
