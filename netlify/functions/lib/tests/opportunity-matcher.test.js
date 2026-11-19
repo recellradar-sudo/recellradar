@@ -1,6 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { titleMatch, listingCost, median, estimateProfit } = require("../../../../resell-radar/opportunity-matcher");
+const { titleMatch, hasKnownShipping, listingCost, median, estimateProfit } = require("../../../../resell-radar/opportunity-matcher");
 
 test("matches equivalent editions and rejects conflicting platform, edition and condition", () => {
   assert.equal(titleMatch("Zelda Tears of the Kingdom Collector Edition Switch sealed", "Zelda Tears Kingdom collector Nintendo Switch factory sealed"), true);
@@ -13,6 +13,8 @@ test("rejects lots and accounts for active-listing shipping in acquisition cost"
   assert.equal(titleMatch("Zelda Collector Edition", "Zelda Collector Edition bundle with case"), false);
   assert.equal(listingCost({ currentPrice: "80", shippingPrice: "12.50" }), 92.5);
   assert.equal(listingCost({ currentPrice: 80 }), 80);
+  assert.equal(hasKnownShipping({ currentPrice: 80, shippingPrice: 0 }), true);
+  assert.equal(hasKnownShipping({ currentPrice: 80 }), false);
 });
 
 test("calculates a transparent median-based net estimate", () => {

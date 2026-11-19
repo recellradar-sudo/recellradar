@@ -31,6 +31,9 @@
     return shared.length >= 2 && shared.length / Math.max(1, union) >= 0.24;
   }
   function positiveNumber(value) { const n = Number(value); return Number.isFinite(n) && n >= 0 ? n : null; }
+  function hasKnownShipping(listing) {
+    return positiveNumber(listing.totalPrice) !== null || positiveNumber(listing.shippingPrice) !== null;
+  }
   function listingCost(listing) {
     const price = positiveNumber(listing.currentPrice ?? listing.price ?? listing.soldPrice);
     const shipping = positiveNumber(listing.shippingPrice);
@@ -41,5 +44,5 @@
     const value = resalePrice * (1 - feeRate) - acquisitionCost - otherCosts;
     return Math.round((value + Number.EPSILON) * 100) / 100;
   }
-  return { titleMatch, listingCost, median, estimateProfit };
+  return { titleMatch, hasKnownShipping, listingCost, median, estimateProfit };
 });
