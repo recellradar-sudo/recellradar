@@ -21,16 +21,17 @@ exports.handler = async (event) => {
     const allowed = new Set(["ebay.fr", "ebay.de", "ebay.co.uk", "ebay.com", "ebay.it", "ebay.es"]);
     if (!keyword) return { statusCode: 400, headers, body: JSON.stringify({ error: "Keyword is required." }) };
     if (!allowed.has(marketplace)) return { statusCode: 400, headers, body: JSON.stringify({ error: "Unsupported marketplace." }) };
-    const apiUrl = "https://api.ebaysoldlistingsapi.com/scrape?keyword=" + encodeURIComponent(keyword) + "&ebaySite=" + encodeURIComponent(marketplace) + "&count=40&sold=true&relevance=true";
+    const mode = body.mode === "active" ? "active" : "sold";
+    const apiUrl = "https://api.ebaysoldlistingsapi.com/scrape?keyword=" + encodeURIComponent(keyword) + "&ebaySite=" + encodeURIComponent(marketplace) + "&count=40&sold=" + (mode === "sold" ? "true" : "false") + "&relevance=true";
     const response = await fetch(apiUrl, { headers: { Authorization: "Bearer " + apiKey }, signal: AbortSignal.timeout(20000) });
     const raw = await response.text();
     if (!response.ok) return { statusCode: 502, headers, body: JSON.stringify({ error: "Sold listings provider returned HTTP " + response.status, detail: raw.slice(0, 300) }) };
     let data;
     try { data = JSON.parse(raw); } catch { return { statusCode: 502, headers, body: JSON.stringify({ error: "Provider response was not valid JSON." }) }; }
     const results = Array.isArray(data.results) ? data.results : [];
-    const normalizedStats = normalizeSales(results);
+    const normalizedStats = mode === "sold" ? normalizeSales(results) : null;
     let historySaved = false;
-    if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    if (mode === "sold" && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
       try {
         const save = await fetch(process.env.SUPABASE_URL.replace(/\\/$/, "") + "/rest/v1/scan_history", {
           method: "POST",
@@ -40,7 +41,7 @@ exports.handler = async (event) => {
         historySaved = save.ok;
       } catch (_) { historySaved = false; }
     }
-    return { statusCode: 200, headers, body: JSON.stringify({ ebaySite: data.ebaySite || marketplace, totalResults: data.totalResults, results, normalizedStats, usageRemaining: response.headers.get("X-Usage-Remaining") || null, historySaved }) };
+    return { statusCode: 200, headers, body: JSON.stringify({ mode, ebaySite: data.ebaySite || marketplace, totalResults: data.totalResults, results, normalizedStats, usageRemaining: response.headers.get("X-Usage-Remaining") || null, historySaved }) };
   } catch (err) {
     return { statusCode: 500, headers, body: JSON.stringify({ error: "Scanner proxy error", detail: String(err.message || err).slice(0, 250) }) };
   }
