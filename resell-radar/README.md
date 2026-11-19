@@ -1,7 +1,18 @@
-# Resell Radar Prototype
+# Resell Radar
 
-Static interactive demo. Open `index.html` in a browser or deploy this folder to a static host (Netlify, Vercel static, GitHub Pages).
+Static interactive demo with a Netlify serverless endpoint for the eBay Sold Listings API (experimental third-party provider).
 
-**Important:** Product rows, scores, calendar and market indicators are illustrative mock data. This prototype does not scrape live markets, store server-side data, or send email. Local demo state is saved in browser localStorage.
+## Deploy on Netlify
+- Netlify config is in root `netlify.toml` (publish directory `resell-radar`, functions directory `netlify/functions`).
+- Configure environment variable `EBAY_SOLD_API_KEY` in Netlify site settings (Site configuration → Environment variables). Never paste the key into the app/browser.
+- Trigger a deploy after adding the variable. The scanner calls `/.netlify/functions/sold-scan`.
+- If Netlify's deploy settings are manually overriding the publish/functions paths, align them with the root `netlify.toml`.
 
-Production next steps: authenticated backend/database, real data providers, scheduled collection jobs, verified sold-price feeds, alert service and Gmail/Google OAuth or email delivery integration.
+## Scanner
+- POST JSON: `{ "keyword": "...", "marketplace": "ebay.fr" }`
+- Supported marketplace IDs: ebay.fr, ebay.de, ebay.co.uk, ebay.com, ebay.it, ebay.es
+- Provider response is passed through as sold results and usage-remaining metadata; no mock rows are generated.
+- API key is server-side only via Netlify environment variable.
+
+## Prototype limitations
+Dashboard/opportunity rows, release calendar, scores and market indicators are still sample/demo data. Watchlist and portfolio state remain browser-local. There is no remote database, scheduled scanning, Gmail sending or user authentication yet.
