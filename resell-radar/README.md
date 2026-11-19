@@ -22,7 +22,7 @@ Open http://127.0.0.1:8888 in a browser. The key exists only for that PowerShell
 
 ## Scanner
 - POST JSON: `{ "keyword": "...", "marketplace": "ebay.fr" }`
-- Supported marketplace IDs: ebay.fr, ebay.de, ebay.co.uk, ebay.com, ebay.it, ebay.es
+- Supported marketplace IDs: ebay.fr, ebay.de, ebay.co.uk, ebay.com, ebay.it, ebay.es, ebay.ca, ebay.com.au
 - Provider response is passed through as sold results and usage-remaining metadata; no mock rows are generated.
 - API key is server-side only via Netlify environment variable.
 
@@ -65,3 +65,6 @@ After a sold-listings scan, the interface displays separate currency statistics 
 - Opportunity comparisons require at least 3 title-matched sold rows, reject lot/accessory-like listings, guard explicit edition, condition and platform differences, and exclude active auctions. These heuristics reduce some false matches but do not prove SKU-level identity.
 - Candidate ranking uses the first quartile (Q1) of matched completed sales, not their median. The median remains visible as an upside scenario; it does not decide whether the listing clears the minimum-profit threshold.
 - The matcher and profit calculation have Node tests in `netlify/functions/lib/tests/opportunity-matcher.test.js`; run all analytics tests with `node --test netlify/functions/lib/tests/*.test.js`.
+
+## World marketplace mode
+The `Monde` option queries all eight marketplaces supported by the provider (France, Germany, UK, US, Italy, Spain, Canada and Australia) with international item location enabled. One world scan uses eight provider requests. Results retain their marketplace and local currency; the app does not combine currencies into one price statistic.

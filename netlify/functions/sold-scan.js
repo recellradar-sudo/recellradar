@@ -18,11 +18,12 @@ exports.handler = async (event) => {
     const body = JSON.parse(event.body || "{}");
     const keyword = String(body.keyword || "").trim().slice(0, 120);
     const marketplace = String(body.marketplace || "ebay.fr");
-    const allowed = new Set(["ebay.fr", "ebay.de", "ebay.co.uk", "ebay.com", "ebay.it", "ebay.es"]);
+    const allowed = new Set(["ebay.fr", "ebay.de", "ebay.co.uk", "ebay.com", "ebay.it", "ebay.es", "ebay.ca", "ebay.com.au"]);
     if (!keyword) return { statusCode: 400, headers, body: JSON.stringify({ error: "Keyword is required." }) };
     if (!allowed.has(marketplace)) return { statusCode: 400, headers, body: JSON.stringify({ error: "Unsupported marketplace." }) };
     const mode = body.mode === "active" ? "active" : "sold";
-    const apiUrl = "https://api.ebaysoldlistingsapi.com/scrape?keyword=" + encodeURIComponent(keyword) + "&ebaySite=" + encodeURIComponent(marketplace) + "&count=" + (mode === "sold" ? "120" : "40") + "&sold=" + (mode === "sold" ? "true" : "false") + (mode === "sold" ? "&bestOfferPrice=true" : "") + "&relevance=true";
+    const itemLocation = body.itemLocation === "worldwide" ? "&itemLocation=worldwide" : "";
+    const apiUrl = "https://api.ebaysoldlistingsapi.com/scrape?keyword=" + encodeURIComponent(keyword) + "&ebaySite=" + encodeURIComponent(marketplace) + "&count=" + (mode === "sold" ? "120" : "40") + "&sold=" + (mode === "sold" ? "true" : "false") + (mode === "sold" ? "&bestOfferPrice=true" : "") + itemLocation + "&relevance=true";
     const response = await fetch(apiUrl, { headers: { Authorization: "Bearer " + apiKey }, signal: AbortSignal.timeout(20000) });
     const raw = await response.text();
     if (!response.ok) return { statusCode: 502, headers, body: JSON.stringify({ error: "Sold listings provider returned HTTP " + response.status, detail: raw.slice(0, 300) }) };
