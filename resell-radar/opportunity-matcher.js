@@ -20,6 +20,13 @@
     if (/\b(used|pre owned|preowned)\b/.test(title)) return "used";
     return null;
   }
+  function classifyCondition(listing) {
+    const source = normalise(String((listing && listing.condition) || "") + " " + String((listing && listing.title) || ""));
+    if (/\b(sealed|factory sealed|brand new)\b/.test(source)) return "sealed";
+    if (/\b(new|neuf|nouveau)\b/.test(source)) return "new";
+    if (/\b(used|pre owned|preowned|occasion|loose|disc only|cart only)\b/.test(source)) return "used";
+    return "unknown";
+  }
   function titleMatch(activeTitle, soldTitle) {
     if (!activeTitle || !soldTitle || BLOCKER.test(normalise(activeTitle)) || BLOCKER.test(normalise(soldTitle))) return false;
     if (incompatible(activeTitle, soldTitle, EDITION_GROUPS) || incompatible(activeTitle, soldTitle, PLATFORM_GROUPS)) return false;
@@ -51,5 +58,5 @@
     const value = resalePrice * (1 - feeRate) - acquisitionCost - otherCosts;
     return Math.round((value + Number.EPSILON) * 100) / 100;
   }
-  return { titleMatch, hasKnownShipping, listingCost, median, quantile, estimateProfit };
+  return { titleMatch, classifyCondition, hasKnownShipping, listingCost, median, quantile, estimateProfit };
 });
