@@ -33,3 +33,10 @@ Dashboard/opportunity rows, release calendar, scores and market indicators are s
 - Each currency group exposes sample size, median, quartiles (Q1/Q3), min/max, count with shipping unknown, and Best Offer rows.
 - Raw `results` remain included for audit/export. This is statistical normalization, not edition matching or a resale forecast.
 - Unit tests are included in `netlify/functions/lib/tests/sales-normalizer.test.js` (run with Node's test runner when available).
+
+
+## Sold-comp margin estimator
+- The Live Market Search scan includes a scenario calculator for maximum buy price.
+- It uses same-currency sold samples only, and displays a conservative Q1 reference and a median reference.
+- Editable inputs: estimated marketplace fee percentage, outbound shipping, other costs, and target net profit.
+- The result is a scenario, not a buy signal: verify edition, completeness, condition, shipping, and liquidity before buying.
