@@ -8,6 +8,18 @@ Static interactive demo with a Netlify serverless endpoint for the eBay Sold Lis
 - Trigger a deploy after adding the variable. The scanner calls `/.netlify/functions/sold-scan` (also exposed through the legacy `/api/sold-search` redirect).
 - If Netlify's deploy settings are manually overriding the publish/functions paths, align them with the root `netlify.toml`.
 
+## Run locally (without Netlify)
+This repository includes a small Node launcher, so the static interface and the server-side scanner can run on the same computer without a Netlify deploy.
+
+In PowerShell, from the repository folder:
+
+```powershell
+$env:EBAY_SOLD_API_KEY = "paste-your-new-key-here"
+node local-server.js
+```
+
+Open http://127.0.0.1:8888 in a browser. The key exists only for that PowerShell session: it is not written to a file or committed to Git. Close the PowerShell window to stop the local server. If you do not set the key, the app still opens but live scans remain disabled.
+
 ## Scanner
 - POST JSON: `{ "keyword": "...", "marketplace": "ebay.fr" }`
 - Supported marketplace IDs: ebay.fr, ebay.de, ebay.co.uk, ebay.com, ebay.it, ebay.es
