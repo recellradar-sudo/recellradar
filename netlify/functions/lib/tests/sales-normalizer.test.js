@@ -33,3 +33,13 @@ test("zero shipping is reported as known", () => {
   assert.equal(stats.currencies[0].median, 40);
   assert.equal(stats.currencies[0].shippingUnknownCount, 0);
 });
+
+test("uses accepted Best Offer price when provider confirms it", () => {
+  const stats = normalizeSales([
+    { soldPrice: 200, totalPrice: 210, soldCurrency: "EUR", bestOfferAccepted: true, acceptedOfferPrice: "175.00", acceptedOfferPriceStatus: "found" },
+    { soldPrice: 190, soldCurrency: "EUR", bestOfferAccepted: true, acceptedOfferPrice: null, acceptedOfferPriceStatus: "pending" }
+  ]);
+  assert.equal(stats.currencies[0].sampleSize, 2);
+  assert.equal(stats.currencies[0].median, 192.5);
+  assert.equal(stats.currencies[0].bestOfferCount, 2);
+});
