@@ -1,0 +1,6 @@
+[build]
+  publish = "resell-radar"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
