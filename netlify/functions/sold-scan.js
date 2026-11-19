@@ -33,7 +33,7 @@ exports.handler = async (event) => {
     let historySaved = false;
     if (mode === "sold" && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
       try {
-        const save = await fetch(process.env.SUPABASE_URL.replace(/\\/$/, "") + "/rest/v1/scan_history", {
+        const save = await fetch(process.env.SUPABASE_URL.replace(/\/$/, "") + "/rest/v1/scan_history", {
           method: "POST",
           headers: { "apikey": process.env.SUPABASE_SERVICE_ROLE_KEY, "Authorization": "Bearer " + process.env.SUPABASE_SERVICE_ROLE_KEY, "Content-Type": "application/json", "Prefer": "return=minimal" },
           body: JSON.stringify({ keyword, marketplace, total_results: data.totalResults ?? results.length, results })
