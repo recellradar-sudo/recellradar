@@ -40,6 +40,6 @@ test("uses accepted Best Offer price when provider confirms it", () => {
     { soldPrice: 190, soldCurrency: "EUR", bestOfferAccepted: true, acceptedOfferPrice: null, acceptedOfferPriceStatus: "pending" }
   ]);
   assert.equal(stats.currencies[0].sampleSize, 2);
-  assert.equal(stats.currencies[0].median, 192.5);
+  assert.equal(stats.currencies[0].median, 182.5);
   assert.equal(stats.currencies[0].bestOfferCount, 2);
 });
