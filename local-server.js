@@ -2,6 +2,7 @@ const http = require("node:http");
 const fs = require("node:fs/promises");
 const path = require("node:path");
 const { handler: soldScan } = require("./netlify/functions/sold-scan");
+const { scanTarget } = require("./radar-runner");
 
 const host = "127.0.0.1";
 const port = Number(process.env.PORT || 8888);
@@ -42,7 +43,24 @@ async function serveStatic(request, response) {
 }
 
 http.createServer(async (request, response) => {
-  if (new URL(request.url, `http://${host}`).pathname === "/.netlify/functions/sold-scan") {
+  const requestPath = new URL(request.url, `http://${host}`).pathname;
+  if (requestPath === "/api/health") {
+    return send(response, 200, { "Content-Type": "application/json" }, JSON.stringify({ local: true, providerConfigured: Boolean(process.env.EBAY_SOLD_API_KEY) }));
+  }
+  if (requestPath === "/api/radar-run") {
+    if (request.method !== "POST") return send(response, 405, { "Content-Type": "application/json" }, JSON.stringify({ error: "POST only" }));
+    try {
+      const payload = JSON.parse(await requestBody(request));
+      const targets = Array.isArray(payload.targets) ? payload.targets.slice(0, 20) : [];
+      if (!targets.length) return send(response, 400, { "Content-Type": "application/json" }, JSON.stringify({ error: "Ajoute au moins une cible." }));
+      const results = [];
+      for (const target of targets) results.push(await scanTarget(target));
+      return send(response, 200, { "Content-Type": "application/json" }, JSON.stringify({ generatedAt: new Date().toISOString(), results }));
+    } catch (error) {
+      return send(response, 502, { "Content-Type": "application/json" }, JSON.stringify({ error: String(error.message || error).slice(0, 250) }));
+    }
+  }
+  if (requestPath === "/api/scan" || requestPath === "/.netlify/functions/sold-scan") {
     const result = await soldScan({ httpMethod: request.method, body: await requestBody(request) });
     return send(response, result.statusCode, result.headers, result.body);
   }
@@ -51,3 +69,4 @@ http.createServer(async (request, response) => {
   console.log(`Resell Radar local: http://${host}:${port}`);
   console.log(process.env.EBAY_SOLD_API_KEY ? "Data provider key: configured for this session" : "Data provider key: not configured (the interface still opens)");
 });
+
