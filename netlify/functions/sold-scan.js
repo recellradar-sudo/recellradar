@@ -13,7 +13,7 @@ exports.handler = async (event) => {
   if (event.httpMethod === "GET") return { statusCode: 200, headers, body: JSON.stringify({ backend: "online", providerConfigured: Boolean(process.env.EBAY_SOLD_API_KEY), provider: "eBaySoldListingsAPI", database: Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) ? "configured" : "not-configured", email: "not-configured" }) };
   if (event.httpMethod !== "POST") return { statusCode: 405, headers, body: JSON.stringify({ error: "POST only" }) };
   const apiKey = process.env.EBAY_SOLD_API_KEY;
-  if (!apiKey) return { statusCode: 503, headers, body: JSON.stringify({ error: "Server API key is not configured. Set EBAY_SOLD_API_KEY in Netlify environment variables." }) };
+  if (!apiKey) return { statusCode: 503, headers, body: JSON.stringify({ error: "La clé EBAY_SOLD_API_KEY n’est pas configurée dans cette session locale." }) };
   try {
     const body = JSON.parse(event.body || "{}");
     const keyword = String(body.keyword || "").trim().slice(0, 120);
