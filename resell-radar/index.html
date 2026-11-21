@@ -284,4 +284,3 @@ const frText=new Map([["Dashboard","Tableau de bord"],["Opportunities","Opportun
 function translateFrench(root=document){document.documentElement.lang="fr";const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);nodes.forEach(node=>{const value=node.nodeValue,trim=value.trim(),translated=frText.get(trim);if(translated)node.nodeValue=value.replace(trim,translated)});root.querySelectorAll("[placeholder]").forEach(element=>{const translated=frText.get(element.placeholder);if(translated)element.placeholder=translated})}
 tableRows();cards();watchlist();portview();translateFrench();
 </script></body></html>
-
