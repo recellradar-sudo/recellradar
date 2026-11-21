@@ -63,8 +63,10 @@ After a sold-listings scan, the interface displays separate currency statistics 
 - API docs: https://ebaysoldlistingsapi.com/docs/active-listings and https://ebaysoldlistingsapi.com/docs/sold-search
 - Sold scans request `bestOfferPrice=true` and the normalizer prefers `acceptedOfferPrice` when its status is `found`; unresolved offers still fall back to the original price and remain a market-price upper-bound risk.
 - Opportunity comparisons require at least 3 title-matched sold rows, reject lot/accessory-like listings, guard explicit edition, condition and platform differences, and exclude active auctions. These heuristics reduce some false matches but do not prove SKU-level identity.
+- The opportunity comparison runs one marketplace at a time. The `Monde` selector is available for raw completed-sales research only; it is deliberately blocked for a margin comparison so that prices in different currencies are never combined or presented as comparable.
 - Candidate ranking uses the first quartile (Q1) of matched completed sales, not their median. The median remains visible as an upside scenario; it does not decide whether the listing clears the minimum-profit threshold.
 - The matcher and profit calculation have Node tests in `netlify/functions/lib/tests/opportunity-matcher.test.js`; run all analytics tests with `node --test netlify/functions/lib/tests/*.test.js`.
 
 ## World marketplace mode
 The `Monde` option queries all eight marketplaces supported by the provider (France, Germany, UK, US, Italy, Spain, Canada and Australia) with international item location enabled. One world scan uses eight provider requests. Results retain their marketplace and local currency; the app does not combine currencies into one price statistic.
+
