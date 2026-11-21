@@ -69,4 +69,3 @@ After a sold-listings scan, the interface displays separate currency statistics 
 
 ## World marketplace mode
 The `Monde` option queries all eight marketplaces supported by the provider (France, Germany, UK, US, Italy, Spain, Canada and Australia) with international item location enabled. One world scan uses eight provider requests. Results retain their marketplace and local currency; the app does not combine currencies into one price statistic.
-
