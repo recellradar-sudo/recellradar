@@ -17,3 +17,16 @@ test("keeps currencies separate and only returns a cautious profitable candidate
   assert.ok(candidates[0].cautiousProfit >= 20);
 });
 
+test("excludes LEGO parts and accessories when scanning a complete set", () => {
+  const active = [{ title: "LEGO Star Wars set 75331 sealed", currentPrice: 90, shippingPrice: 0, currentCurrency: "EUR", buyingFormat: "Buy It Now" }, { title: "LEGO Star Wars minifigure piece", currentPrice: 5, shippingPrice: 0, currentCurrency: "EUR", buyingFormat: "Buy It Now" }];
+  const sold = [
+    { title: "LEGO Star Wars set 75331 sealed", totalPrice: 180, shippingPrice: 0, soldCurrency: "EUR" },
+    { title: "LEGO Star Wars set 75331 sealed", totalPrice: 190, shippingPrice: 0, soldCurrency: "EUR" },
+    { title: "LEGO Star Wars set 75331 sealed", totalPrice: 200, shippingPrice: 0, soldCurrency: "EUR" },
+    { title: "LEGO Star Wars minifigure piece", totalPrice: 30, shippingPrice: 0, soldCurrency: "EUR" }
+  ];
+  const candidates = findCandidates({ active, sold, category: "lego-set", minProfit: 20, otherCosts: 5.99 });
+  assert.equal(candidates.length, 1);
+  assert.equal(candidates[0].title, "LEGO Star Wars set 75331 sealed");
+});
+

@@ -2,6 +2,13 @@ const fs = require("node:fs/promises");
 const { handler: soldScan } = require("./netlify/functions/sold-scan");
 const matcher = require("./resell-radar/opportunity-matcher");
 
+const LEGO_PART_OR_ACCESSORY = /\b(piece|pieces|pi[eè]ce|pi[eè]ces|part|parts|brick|bricks|brique|briques|plate|tile|minifig|minifigure|figurine|instruction|notice|manual|sticker|moc|custom|compatible|lot|bundle|bo[iî]te seule|empty box)\b/i;
+
+function isExcludedByCategory(listing, category) {
+  if (category !== "lego-set") return false;
+  return LEGO_PART_OR_ACCESSORY.test(String(listing && listing.title || ""));
+}
+
 function deliveredPrice(listing) {
   const value = listing.bestOfferAccepted && listing.acceptedOfferPriceStatus === "found"
     ? listing.acceptedOfferPrice
@@ -10,10 +17,11 @@ function deliveredPrice(listing) {
   return Number.isFinite(price) && price > 0 ? price : null;
 }
 
-function findCandidates({ active, sold, condition = "all", feeRate = 0.135, otherCosts = 5.99, minProfit = 20 }) {
+function findCandidates({ active, sold, category = "general", condition = "all", feeRate = 0.135, otherCosts = 5.99, minProfit = 20 }) {
   const sameCondition = item => condition === "all" || matcher.classifyCondition(item) === condition;
-  const activeRows = (active || []).filter(sameCondition).filter(matcher.hasKnownShipping);
-  const soldRows = (sold || []).filter(sameCondition).map(listing => ({
+  const allowed = item => sameCondition(item) && !isExcludedByCategory(item, category);
+  const activeRows = (active || []).filter(allowed).filter(matcher.hasKnownShipping);
+  const soldRows = (sold || []).filter(allowed).map(listing => ({
     listing,
     price: deliveredPrice(listing),
     currency: String(listing.soldCurrency || listing.currency || "UNKNOWN").toUpperCase()
@@ -45,8 +53,9 @@ function findCandidates({ active, sold, condition = "all", feeRate = 0.135, othe
   }).filter(Boolean).sort((a, b) => b.cautiousProfit - a.cautiousProfit);
 }
 
-async function requestScan(keyword, marketplace, mode) {
-  const response = await soldScan({ httpMethod: "POST", body: JSON.stringify({ keyword, marketplace, mode }) });
+async function requestScan(keyword, marketplace, mode, category) {
+  const categoryId = category === "lego-set" ? "19006" : "";
+  const response = await soldScan({ httpMethod: "POST", body: JSON.stringify({ keyword, marketplace, mode, categoryId }) });
   const payload = JSON.parse(response.body);
   if (response.statusCode !== 200) throw new Error(payload.error || `Scan error (${response.statusCode})`);
   return payload;
@@ -55,15 +64,17 @@ async function requestScan(keyword, marketplace, mode) {
 async function scanTarget(target) {
   const keyword = String(target.keyword || "").trim();
   const marketplace = String(target.marketplace || "ebay.fr");
+  const category = target.category === "lego-set" || /\blego\b/i.test(keyword) ? "lego-set" : "general";
   if (!keyword) throw new Error("Chaque cible doit définir keyword.");
   if (marketplace === "world") throw new Error("Chaque cible doit utiliser un seul marché eBay, pas world.");
   const [active, sold] = await Promise.all([
-    requestScan(keyword, marketplace, "active"),
-    requestScan(keyword, marketplace, "sold")
+    requestScan(keyword, marketplace, "active", category),
+    requestScan(keyword, marketplace, "sold", category)
   ]);
   return {
     keyword,
     marketplace,
+    category,
     activeListings: Array.isArray(active.results) ? active.results.length : 0,
     completedSales: Array.isArray(sold.results) ? sold.results.length : 0,
     candidates: findCandidates({ active: active.results, sold: sold.results, ...target })
