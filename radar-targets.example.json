@@ -1,0 +1,13 @@
+{
+  "targets": [
+    {
+      "keyword": "remplace par une référence eBay précise",
+      "marketplace": "ebay.fr",
+      "condition": "sealed",
+      "minProfit": 20,
+      "feeRate": 0.135,
+      "otherCosts": 5.99
+    }
+  ]
+}
+
